@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-image: url('preview16.jpeg');
+      background-size: cover;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let drops = [];
+    let lightning = true;
+
+    function createRaindrops() {
+      for (let i = 0; i < 500; i++) {
+        let x = Math.random() * canvas.width;
+        let y = Math.random() * canvas.height;
+        let speed = 1+ Math.random() *3;
+        drops.push({ x, y, speed });
+      }
+    }
+
+    function drawRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#007bff'; 
+      for (let i = 0; i < drops.length; i++) {
+        ctx.fillRect(drops[i].x, drops[i].y, 2, 10);
+      }
+
+  
+      if (lightning) {
+        const startX =  Math.random() * canvas.width;
+        const startY = 0;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; 
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+
+        const steps = 100;
+        let prevX = startX;
+        let prevY = startY;
+
+        for (let i = 0; i < steps; i++) {
+          const newX = prevX + Math.random() * 20 - 10;
+          const newY = prevY + Math.random() * 40;
+          ctx.lineTo(newX, newY);
+          prevX = newX;
+          prevY = newY;
+        }
+
+        ctx.stroke();
+        fadeOut();
+      }
+    }
+
+    function updateRain() {
+      for (let i = 0; i < drops.length; i++) {
+        drops[i].y += drops[i].speed;
+
+        if (drops[i].y > canvas.height) {
+          drops[i].y = 0;
+          drops[i].x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    function animate() {
+      drawRain();
+      updateRain();
+      requestAnimationFrame(animate);
+    }
+
+    function generateLightning() {
+      lightning = true;
+    }
+
+    function fadeOut() {
+      setTimeout(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        lightning = false;
+      }, 100);
+    }
+
+    createRaindrops();
+    animate();
+
+    setInterval(() => {
+      if (Math.random() < 0.8) {
+        generateLightning();
+      }
+    }, 1000); 
+  </script>
+</body>
+</html>
